@@ -107,7 +107,7 @@ while True:
         print("Make sure you're running OBS!")
 
         height, width, layers = updated_frame.shape
-        virtual_cam = pyvirtualcam.Camera(width=width, height=height, fps=20)
+        virtual_cam = pyvirtualcam.Camera(width=width, height=height, fps=30)
         print(f"Using virtual camera: {virtual_cam.device}")
 
     # frame[:] = cam.frames_sent % 255  # grayscale animation
