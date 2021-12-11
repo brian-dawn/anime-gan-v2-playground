@@ -1,8 +1,12 @@
+# pip install mss pyvirtualcam facenet_pytorch pykalman
+
 import torch
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw
+
 from mss import mss
+import pyvirtualcam
 
 # Stuff for face tracking/cropping.
 from facenet_pytorch import InceptionResnetV1, MTCNN
@@ -28,17 +32,19 @@ face_observations = []
 kf = None
 filtered_state_means = None
 filtered_state_covariances = None
+
+virtual_cam = None
 while True:
 
     # Capture the video frame
     # by frame
-    # ret, frame = vid.read()
+    ret, frame = vid.read()
 
-    with mss() as sct:
-        monitor = {"top": 40, "left": 0, "width": 800, "height": 640}
-        frame = np.array(sct.grab(monitor))
-        # Remove the alpha channel.
-        frame = frame[:, :, :3]
+    # with mss() as sct:
+    #     monitor = {"top": 40, "left": 0, "width": 800, "height": 640}
+    #     frame = np.array(sct.grab(monitor))
+    #     # Remove the alpha channel.
+    #     frame = frame[:, :, :3]
 
     # Detect faces
     boxes, _ = mtcnn.detect(frame)
@@ -96,10 +102,24 @@ while True:
 
     height, width, layers = updated_frame.shape
     updated_frame = cv2.resize(updated_frame, (height * 2, width * 2))
-    cv2.imshow("frame", updated_frame)
 
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+    if virtual_cam is None:
+        print("Make sure you're running OBS!")
 
+        height, width, layers = updated_frame.shape
+        virtual_cam = pyvirtualcam.Camera(width=width, height=height, fps=20)
+        print(f"Using virtual camera: {virtual_cam.device}")
+
+    # frame[:] = cam.frames_sent % 255  # grayscale animation
+
+    updated_frame = cv2.cvtColor(updated_frame, cv2.COLOR_BGR2RGB)
+    virtual_cam.send(updated_frame)
+    virtual_cam.sleep_until_next_frame()
+
+    # cv2.imshow("frame", updated_frame)
+    # if cv2.waitKey(1) & 0xFF == ord("q"):
+    #     break
+
+virtual_cam.close()
 vid.release()
 cv2.destroyAllWindows()
