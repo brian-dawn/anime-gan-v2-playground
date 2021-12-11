@@ -11,7 +11,7 @@ import pyvirtualcam
 from pykalman import KalmanFilter
 
 # Local libs.
-# import detection
+import detection
 import anime_gan
 import facetracking
 
