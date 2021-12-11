@@ -4,7 +4,7 @@ import cv2
 from PIL import Image
 from torch._C import device
 
-pretrained_model_name = "celeba_distill"  # or paprika, celeba_distill, or face_paint_512_v1, or face_paint_512_v2
+pretrained_model_name = "face_paint_512_v2"  # or paprika, celeba_distill, or face_paint_512_v1, or face_paint_512_v2
 model = torch.hub.load(
     "bryandlee/animegan2-pytorch:main", "generator", pretrained=pretrained_model_name
 )
