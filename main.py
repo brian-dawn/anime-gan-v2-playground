@@ -83,6 +83,8 @@ while True:
 
     updated_frame = cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
 
+    height, width, layers = updated_frame.shape
+    updated_frame = cv2.resize(updated_frame, (height * 2, width * 2))
     cv2.imshow("frame", updated_frame)
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
