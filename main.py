@@ -40,6 +40,7 @@ while True:
     if frame_counter % 10 == 0:
 
         print("fps: ", frame_counter / (time.time() - last_time))
+        frame_counter = 0
         last_time = time.time()
 
     # Capture the video frame
