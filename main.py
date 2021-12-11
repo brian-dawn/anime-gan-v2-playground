@@ -56,28 +56,30 @@ while True:
 
         face_observations.append(coords)
 
-    obs_to_average = 5
-    face_observations = face_observations[-obs_to_average:]
-    [x1, y1, x2, y2] = [int(x) for x in np.average(face_observations, axis=0)]
-    # TODO: attempt to get kalman filters working.
-    # if kf is None:
-    #     kf = KalmanFilter(initial_state_mean=coords)
-    #     filtered_state_means = kf.initial_state_mean
-    #     filtered_state_covariances = kf.initial_state_covariance
-    #     filtered_state_means, filtered_state_covariances = kf.em(coords).smooth(coords)
-    #     print("Initialized Kalman Filter")
-    #     print(filtered_state_means)
-    #     print(filtered_state_covariances)
-    # filtered_state_means, filtered_state_covariances = kf.filter_update(
-    #     filtered_state_means[-1], filtered_state_covariances[-1], observation=coords
-    # )
-    # # smoothed = kf.em(coords).smooth(coords)[0][:, 0]
-    # smoothed = filtered_state_means[0][:, 0]
-    # [x1, y1, x2, y2] = [int(x) for x in smoothed]
-    # print(x1, y1, x2, y2)
+    # If we have a face go to that, otherwise display the entire image.
+    if len(face_observations) != 0:
+        obs_to_average = 5
+        face_observations = face_observations[-obs_to_average:]
+        [x1, y1, x2, y2] = [int(x) for x in np.average(face_observations, axis=0)]
+        # TODO: attempt to get kalman filters working.
+        # if kf is None:
+        #     kf = KalmanFilter(initial_state_mean=coords)
+        #     filtered_state_means = kf.initial_state_mean
+        #     filtered_state_covariances = kf.initial_state_covariance
+        #     filtered_state_means, filtered_state_covariances = kf.em(coords).smooth(coords)
+        #     print("Initialized Kalman Filter")
+        #     print(filtered_state_means)
+        #     print(filtered_state_covariances)
+        # filtered_state_means, filtered_state_covariances = kf.filter_update(
+        #     filtered_state_means[-1], filtered_state_covariances[-1], observation=coords
+        # )
+        # # smoothed = kf.em(coords).smooth(coords)[0][:, 0]
+        # smoothed = filtered_state_means[0][:, 0]
+        # [x1, y1, x2, y2] = [int(x) for x in smoothed]
+        # print(x1, y1, x2, y2)
 
-    # Crop it.
-    frame = frame[y1:y2, x1:x2]
+        # Crop it.
+        frame = frame[y1:y2, x1:x2]
 
     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     im_pil = Image.fromarray(img)
