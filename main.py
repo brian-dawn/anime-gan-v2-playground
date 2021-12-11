@@ -1,4 +1,5 @@
 # pip install mss pyvirtualcam facenet_pytorch pykalman
+import io
 
 import torch
 import numpy as np
@@ -9,6 +10,8 @@ from mss import mss
 import pyvirtualcam
 
 from pykalman import KalmanFilter
+
+import rembg.bg as bg
 
 # Local libs.
 import detection
@@ -32,11 +35,27 @@ while True:
     # by frame
     ret, frame = vid.read()
 
+    # background removal with rembg
+    _is_success, buffer = cv2.imencode(".png", frame)
+    result = bg.remove(buffer)
+    frame = Image.open(io.BytesIO(result)).convert("RGBA")
+    frame = np.array(frame)
+    frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
+
+    # Background removal with detectron2
+    # people_masks = detection.predict(frame)
+    # for mask in people_masks:
+    #     mask = mask.numpy()
+    #     # Mask out everything that's false.
+    #     frame[~mask, :] = [0, 0, 0]
+
+    # Screen capture.
     # with mss() as sct:
     #     monitor = {"top": 40, "left": 0, "width": 800, "height": 640}
     #     frame = np.array(sct.grab(monitor))
     #     # Remove the alpha channel.
     #     frame = frame[:, :, :3]
+
     boxes = facetracking.detect_faces(frame)
 
     # No faces detected.
