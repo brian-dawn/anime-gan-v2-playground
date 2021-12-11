@@ -1,5 +1,6 @@
 # pip install mss pyvirtualcam facenet_pytorch pykalman
 import io
+import time
 
 import torch
 import numpy as np
@@ -29,7 +30,17 @@ filtered_state_means = None
 filtered_state_covariances = None
 
 virtual_cam = None
+
+
+frame_counter = 0
+last_time = time.time()
 while True:
+
+    frame_counter += 1
+    if frame_counter % 10 == 0:
+
+        print("fps: ", frame_counter / (time.time() - last_time))
+        last_time = time.time()
 
     # Capture the video frame
     # by frame
