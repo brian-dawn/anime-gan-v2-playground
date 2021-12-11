@@ -37,24 +37,26 @@ while True:
     boxes, _ = mtcnn.detect(frame)
 
     # No faces detected.
-    if boxes is None or len(boxes) == 0:
-        continue
+    if boxes is not None and len(boxes) != 0:
 
-    round_to = 1
-    [x1, y1, x2, y2] = [int(round(x / round_to) * round_to) for x in boxes[0].tolist()]
+        round_to = 1
+        [x1, y1, x2, y2] = [
+            int(round(x / round_to) * round_to) for x in boxes[0].tolist()
+        ]
 
-    percent = 0.5
+        percent = 0.5
 
-    width = x2 - x1
-    height = y2 - y1
-    x1 = max(0, x1 - width * percent)
-    x2 = min(frame.shape[1], x2 + width * percent)
-    y1 = max(0, y1 - height * percent)
-    y2 = min(frame.shape[0], y2 + height * percent)
-    coords = [x1, y1, x2, y2]
+        width = x2 - x1
+        height = y2 - y1
+        x1 = max(0, x1 - width * percent)
+        x2 = min(frame.shape[1], x2 + width * percent)
+        y1 = max(0, y1 - height * percent)
+        y2 = min(frame.shape[0], y2 + height * percent)
+        coords = [x1, y1, x2, y2]
 
-    obs_to_average = 10
-    face_observations.append(coords)
+        face_observations.append(coords)
+
+    obs_to_average = 5
     face_observations = face_observations[-obs_to_average:]
     [x1, y1, x2, y2] = [int(x) for x in np.average(face_observations, axis=0)]
     # TODO: attempt to get kalman filters working.
