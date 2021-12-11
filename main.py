@@ -8,21 +8,13 @@ from PIL import Image, ImageDraw
 from mss import mss
 import pyvirtualcam
 
-# Stuff for face tracking/cropping.
-from facenet_pytorch import InceptionResnetV1, MTCNN
 from pykalman import KalmanFilter
 
-pretrained_model_name = "face_paint_512_v2"  # or paprika, celeba_distill, or face_paint_512_v1, or face_paint_512_v2
-model = torch.hub.load(
-    "bryandlee/animegan2-pytorch:main", "generator", pretrained=pretrained_model_name
-)
-model = model.to("cuda")
-face2paint = torch.hub.load(
-    "bryandlee/animegan2-pytorch:main", "face2paint", size=512, device="cuda"
-)
+# Local libs.
+# import detection
+import anime_gan
+import facetracking
 
-# face tracking
-mtcnn = MTCNN(keep_all=True, device="cuda")
 
 # define a video capture object
 vid = cv2.VideoCapture(0)
@@ -45,9 +37,7 @@ while True:
     #     frame = np.array(sct.grab(monitor))
     #     # Remove the alpha channel.
     #     frame = frame[:, :, :3]
-
-    # Detect faces
-    boxes, _ = mtcnn.detect(frame)
+    boxes = facetracking.detect_faces(frame)
 
     # No faces detected.
     if boxes is not None and len(boxes) != 0:
@@ -94,10 +84,7 @@ while True:
         # Crop it.
         frame = frame[y1:y2, x1:x2]
 
-    img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    im_pil = Image.fromarray(img)
-    out = face2paint(model, im_pil)
-
+    out = anime_gan.anime(frame)
     updated_frame = cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
 
     height, width, layers = updated_frame.shape
