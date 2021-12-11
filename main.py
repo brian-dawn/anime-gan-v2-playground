@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw
+from mss import mss
 
 # Stuff for face tracking/cropping.
 from facenet_pytorch import InceptionResnetV1, MTCNN
@@ -31,7 +32,13 @@ while True:
 
     # Capture the video frame
     # by frame
-    ret, frame = vid.read()
+    # ret, frame = vid.read()
+
+    with mss() as sct:
+        monitor = {"top": 40, "left": 0, "width": 800, "height": 640}
+        frame = np.array(sct.grab(monitor))
+        # Remove the alpha channel.
+        frame = frame[:, :, :3]
 
     # Detect faces
     boxes, _ = mtcnn.detect(frame)
