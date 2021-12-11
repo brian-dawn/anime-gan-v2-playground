@@ -42,26 +42,16 @@ while True:
     y2 = min(frame.shape[0], y2 + pad)
     frame = frame[y1:y2, x1:x2]
 
-    # draw = ImageDraw.Draw(frame)
-    # for box in boxes:
-    #    draw.rectangle(box.tolist(), outline=(255, 0, 0), width=6)
-
     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     im_pil = Image.fromarray(img)
     out = face2paint(model, im_pil)
 
     updated_frame = cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
 
-    # Display the resulting frame
     cv2.imshow("frame", updated_frame)
 
-    # the 'q' button is set as the
-    # quitting button you may use any
-    # desired button of your choice
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
-# After the loop release the cap object
 vid.release()
-# Destroy all the windows
 cv2.destroyAllWindows()
