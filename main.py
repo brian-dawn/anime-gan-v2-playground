@@ -82,6 +82,36 @@ def crop_face(frame):
     return frame
 
 
+def frame_from_video(path):
+    global vid_cap
+
+    try:
+        vid_cap
+    except NameError:
+        vid_cap = cv2.VideoCapture(path)
+
+    if not vid_cap.isOpened():
+        return None
+
+    ret, frame = vid_cap.read()
+    if ret:
+        return frame
+    return None
+
+
+def write_frame_to_video(frame, path):
+    global video_writer
+
+    try:
+        video_writer
+    except NameError:
+        video_writer = cv2.VideoWriter(
+            path, cv2.VideoWriter_fourcc(*"MJPG"), 30, (frame.shape[1], frame.shape[0])
+        )
+
+    video_writer.write(frame)
+
+
 def frame_from_web_cam():
 
     global vid
@@ -179,28 +209,16 @@ while True:
 
     # Capture the video frame by frame
 
-    frame = frame_from_web_cam()
+    # frame = frame_from_web_cam()
     # frame = frame_from_screen_cap(0, 0, 1024, 1400)
+    frame = frame_from_video("c:/Users/Brian/Downloads/foo.mp4")
 
-    # background removal with rembg
-    # _is_success, buffer = cv2.imencode(".png", frame)
-    # result = bg.remove(buffer)
-    # frame = Image.open(io.BytesIO(result)).convert("RGBA")
-    # frame = np.array(frame)
-    # frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
-
-    # Background removal with detectron2
-    # people_masks = detection.predict(frame)
-    # for mask in people_masks:
-    #     mask = mask.numpy()
-    #     # Mask out everything that's false.
-    #     frame[~mask, :] = [0, 0, 0]
-
-    frame = crop_face(frame)
+    # frame = crop_face(frame)
 
     frame = anime_gan.anime(frame)
 
-    dump_frame_to_obs_virtual_cam(frame)
+    # dump_frame_to_obs_virtual_cam(frame)
+    write_frame_to_video(frame, "c:/Users/Brian/Downloads/out.avi")
 
     cv2.imshow("frame", frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):
