@@ -24,6 +24,8 @@ import detection
 import anime_gan
 import facetracking
 
+from pyxelate import Pyx
+import skimage
 
 # define a video capture object
 
@@ -97,6 +99,26 @@ def frame_from_video(path):
     if ret:
         return frame
     return None
+
+
+def pixelate(frame):
+    global pyx_transformer
+
+    downsample_by = 2  # new image will be 1/14th of the original in size
+    palette = 14  # find 7 colors
+    image = frame[:, :, ::-1]
+
+    try:
+        pyx_transformer
+    except NameError:
+        pyx_transformer = Pyx(factor=downsample_by, palette=palette)
+        # Learn color palette
+        pyx_transformer.fit(image)
+
+    new_image = pyx_transformer.transform(image)
+    cv_image = skimage.img_as_ubyte(new_image)
+    cv_image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2BGR)
+    return cv_image
 
 
 def write_frame_to_video(frame, path):
@@ -201,6 +223,15 @@ def cleanup(signum=None, frame=None):
     print("Cleanup complete")
 
 
+def scale_frame_to_width(frame, new_width, interpolation=cv2.INTER_NEAREST):
+    height, width, layers = frame.shape
+
+    aspect_ratio = float(width) / height
+
+    new_height = int(new_width / aspect_ratio)
+    return cv2.resize(frame, (new_width, new_height), interpolation=interpolation)
+
+
 signal.signal(signal.SIGINT, cleanup)
 
 while True:
@@ -209,16 +240,19 @@ while True:
 
     # Capture the video frame by frame
 
-    # frame = frame_from_web_cam()
+    frame = frame_from_web_cam()
     # frame = frame_from_screen_cap(0, 0, 1024, 1400)
-    frame = frame_from_video("c:/Users/Brian/Downloads/foo.mp4")
+    # frame = frame_from_video("c:/Users/Brian/Downloads/foo.mp4")
 
-    # frame = crop_face(frame)
+    frame = crop_face(frame)
 
     frame = anime_gan.anime(frame)
 
+    frame = pixelate(frame)
+    frame = scale_frame_to_width(frame, 1000)
+
     # dump_frame_to_obs_virtual_cam(frame)
-    write_frame_to_video(frame, "c:/Users/Brian/Downloads/out.avi")
+    # write_frame_to_video(frame, "c:/Users/Brian/Downloads/out.avi")
 
     cv2.imshow("frame", frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):

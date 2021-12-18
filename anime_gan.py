@@ -10,7 +10,7 @@ model = torch.hub.load(
 )
 model = model.to("cuda")
 face2paint = torch.hub.load(
-    "bryandlee/animegan2-pytorch:main", "face2paint", size=1024, device="cuda"
+    "bryandlee/animegan2-pytorch:main", "face2paint", size=512, device="cuda"
 )
 
 
