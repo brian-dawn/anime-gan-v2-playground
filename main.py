@@ -26,7 +26,6 @@ import facetracking
 
 
 # define a video capture object
-vid = cv2.VideoCapture(0)
 
 
 # frame = cv2.imread("c:/Users/Brian/Downloads/wallace.jpg")
@@ -79,6 +78,22 @@ def crop_face(frame):
 
         # Crop it.
         frame = frame[y1:y2, x1:x2]
+
+    return frame
+
+
+def frame_from_web_cam():
+
+    global vid
+
+    try:
+        vid
+    except NameError:
+        # Open the webcam.
+        vid = cv2.VideoCapture(0)
+        print("Using webcam")
+
+    ret, frame = vid.read()
 
     return frame
 
@@ -163,9 +178,9 @@ while True:
     calculate_fps()
 
     # Capture the video frame by frame
-    # ret, frame = vid.read()
 
-    frame = frame_from_screen_cap(0, 0, 1024, 1400)
+    frame = frame_from_web_cam()
+    # frame = frame_from_screen_cap(0, 0, 1024, 1400)
 
     # background removal with rembg
     # _is_success, buffer = cv2.imencode(".png", frame)
