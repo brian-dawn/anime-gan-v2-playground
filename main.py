@@ -105,7 +105,7 @@ def pixelate(frame):
     global pyx_transformer
 
     downsample_by = 2  # new image will be 1/14th of the original in size
-    palette = 14  # find 7 colors
+    palette = 64  # find 7 colors
     image = frame[:, :, ::-1]
 
     try:
@@ -246,7 +246,7 @@ while True:
 
     frame = crop_face(frame)
 
-    frame = anime_gan.anime(frame)
+    #frame = anime_gan.anime(frame)
 
     frame = pixelate(frame)
     frame = scale_frame_to_width(frame, 1000)
