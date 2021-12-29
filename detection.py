@@ -64,34 +64,20 @@ if __name__ == "__main__":
     import cv2
     import numpy as np
 
-    vid = cv2.VideoCapture(0)
+    vid = cv2.VideoCapture(1)
 
     while True:
 
-        ret, frame = vid.read()
+        ret, im = vid.read()
 
-        people_masks = predict(frame)
+        outputs = predictor(im[..., ::-1])
+        v = Visualizer(
+            im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2
+        )
+        out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+        plt.figure(figsize=(20, 10))
+        cv2.imshow("frame", out.get_image()[..., ::-1][..., ::-1])
 
-        for mask in people_masks:
-
-            mask = mask.numpy()
-
-            # Mask out everything that's false.
-            frame[~mask, :] = [0, 0, 0]
-
-            # h, w = mask.shape
-            # bin_mask = np.zeros_like(frame)
-            # print(mask.shape)
-            # print(bin_mask.shape)
-            # bin_mask = np.where(mask == True, 255, bin_mask)
-            # # bin_mask = bin_mask + mask
-
-            # # bin_mask = bin_mask.astype("np.uint8")
-            # print(type(mask))
-
-            # frame = cv2.bitwise_and(frame, frame, mask=bin_mask)
-
-        cv2.imshow("frame", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
         # predict(frame)
